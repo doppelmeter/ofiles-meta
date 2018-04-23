@@ -1,0 +1,22 @@
+Attribut-Name,Description,.ocd,.ocdDem,.xmap
+path,,x,x,x
+filename,,x,x,x
+file_extension, .ocd/.xmap/...,x,x,x
+file_group,OCAD/Mapper/...,x,x,x
+file_type,Map/CourseSetting/...,x,,
+note,for example the OCAD-Map-note,x,,x
+version,for example by OCAD files OCAD12,x,x,
+scale,,x,,x
+crs_code,,x,,
+crs_name,,x,,
+colors,list of color-objects,,,x
+backgroundmaps,list of backgroundmap objects,,,
+symbols,list of symbol objects,,,x
+courses,list of course-objects,,,
+pixelsize,,,x,
+coordinate_bottomleft,,,x,
+coordinate_topright,,,x,
+pixel_minvalue,,,x,
+pixel_maxvalue,,,x,
+pixel_pixelsize_in_x,,,x,
+pixel_pixelsize_in_y,,,x,
