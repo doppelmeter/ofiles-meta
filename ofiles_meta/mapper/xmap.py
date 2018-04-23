@@ -44,4 +44,4 @@ class x:
 
 x.path = r"C:\Users\Marius\Google Drive\Computer\Python\ofiles_meta\ofiles_meta\mapper\forest_sample.xmap"
 
-#analyze(x)
+# analyze(x)

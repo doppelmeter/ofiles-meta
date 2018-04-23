@@ -11,7 +11,7 @@ class _StatVar:
 
 class OFileMeta:
     def __init__(self):
-        """Defines the variables for all posible attributes"""
+        """Define the variables for all posible attributes"""
         # basic file information
         self.path = None
         self.filename = None
@@ -28,8 +28,8 @@ class OFileMeta:
         self.crs_code = None
         self.crs_name = None
         self.colors = []  # list of color-objects
-        self.backgroundmaps = []  #list of backgroundmap objects
-        self.symbols = []  #list of symbol objects
+        self.backgroundmaps = []  # list of backgroundmap objects
+        self.symbols = []  # list of symbol objects
 
         # course-setting informations
         self.courses = []  # list of course-objects
@@ -66,6 +66,7 @@ class OFileMeta:
         self.symbols.append(Symbol(number=number, name=name))
 
     def info(self):
+        """Return alle ofiles_meta attributes nicely formated as string."""
         output = ""
         output += "Filename: " + self.filename + "\n"
         output += "=" * 20 + "\n"
@@ -132,7 +133,11 @@ class course:
 
 
 def get_meta(path):
-    """main function for getting all metadata of an file"""
+    """Main function for getting all metadata of an file.
+
+    arg:
+    path: path to a file
+    """
     ofilemeta = OFileMeta()
 
     ofilemeta.path = path

@@ -1,11 +1,11 @@
 from struct import *
 
+
 def analyze(ofilemeta):
     file = open(ofilemeta.path, "rb")
 
     header = file.read(65)
     file.close()
-
 
     struc_string ="<b8shx10i"
     unpacked = unpack_from(struc_string, header)
@@ -19,12 +19,12 @@ def analyze(ofilemeta):
     ofilemeta.pixel_pixelsize_in_x = unpacked[11]
     ofilemeta.pixel_pixelsize_in_y = unpacked[12]
 
-
-
     return(ofilemeta)
+
 
 class x:
     pass
+
 
 x.path = r"C:\Users\Marius\Google Drive\Computer\Python\ofiles_meta\ofiles_meta\test\testfiles\OcadDem-File-Sample.ocdDem"
 analyze(x)
