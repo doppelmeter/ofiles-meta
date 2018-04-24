@@ -30,7 +30,6 @@ def analyze(ofilemeta):
                             number=atr["code"], name=atr["name"])
                         print(symbol.attrib)
                 print(color.tag)
-        print(each.tag)
 
     return (ofilemeta)
 

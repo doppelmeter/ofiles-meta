@@ -1,4 +1,4 @@
-from struct import *
+from struct import unpack_from
 
 
 def analyze(ofilemeta):
@@ -27,4 +27,4 @@ class x:
 
 
 x.path = r"C:\Users\Marius\Google Drive\Computer\Python\ofiles_meta\ofiles_meta\test\testfiles\OcadDem-File-Sample.ocdDem"
-analyze(x)
+# analyze(x)

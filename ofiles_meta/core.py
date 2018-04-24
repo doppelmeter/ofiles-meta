@@ -1,7 +1,7 @@
 import os
-from ofiles_meta.ocad.ocd import analyze as analyze_ocd
-from ofiles_meta.ocad.ocdDem import analyze as analyze_ocdDem
-from ofiles_meta.mapper.xmap import analyze as analyze_xmap
+from ocad.ocd import analyze as analyze_ocd
+from ocad.ocdDem import analyze as analyze_ocdDem
+from mapper.xmap import analyze as analyze_xmap
 
 
 class _StatVar:
