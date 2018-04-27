@@ -3,14 +3,14 @@ import io
 
 
 def analyze(ofilemeta):
-    fileinfo = file_info(ofilemeta.path)
-    ofilemeta.scale = fileinfo["scale"]
-    ofilemeta.note = fileinfo["note"]
-    ofilemeta.crs_code = fileinfo["epsg_code"]
-    ofilemeta.crs_name = fileinfo["epsg_name"]
-    ofilemeta.file_type = fileinfo["typ"]
-    ofilemeta.version = fileinfo["version_long"]
-    colors_dict = _string_colors(ofilemeta.path)
+    fileinfo = file_info(ofilemeta.file_path)
+    ofilemeta.map_scale = fileinfo["scale"]
+    ofilemeta.meta_note = fileinfo["note"]
+    ofilemeta.map_crs_code = fileinfo["epsg_code"]
+    ofilemeta.map_crs_name = fileinfo["epsg_name"]
+    ofilemeta.meta_type = fileinfo["typ"]
+    ofilemeta.meta_version = fileinfo["version_long"]
+    colors_dict = _string_colors(ofilemeta.file_path)
     for key in colors_dict.keys():
         atr = colors_dict[key]
         ofilemeta._add_color(

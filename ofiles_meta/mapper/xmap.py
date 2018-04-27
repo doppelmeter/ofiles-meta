@@ -2,14 +2,14 @@ import xml.etree.ElementTree as ET
 
 
 def analyze(ofilemeta):
-    tree = ET.parse(ofilemeta.path)
+    tree = ET.parse(ofilemeta.file_path)
     root = tree.getroot()
 
     for each in root:
         if each.tag == "{http://openorienteering.org/apps/mapper/xml/v2}notes":
-            ofilemeta.note = each.text
+            ofilemeta.meta_note = each.text
         elif each.tag == "{http://openorienteering.org/apps/mapper/xml/v2}georeferencing":
-            ofilemeta.scale = each.attrib["scale"]
+            ofilemeta.map_scale = each.attrib["scale"]
         elif each.tag == "{http://openorienteering.org/apps/mapper/xml/v2}colors":
             for color in each:
                 atr = color.attrib

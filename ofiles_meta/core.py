@@ -1,7 +1,8 @@
 import os
-from ocad.ocd import analyze as analyze_ocd
-from ocad.ocdDem import analyze as analyze_ocdDem
-from mapper.xmap import analyze as analyze_xmap
+import datetime
+from ofiles_meta.ocad.ocd import analyze as analyze_ocd
+from ofiles_meta.ocad.ocdDem import analyze as analyze_ocdDem
+from ofiles_meta.mapper.xmap import analyze as analyze_xmap
 
 
 class _StatVar:
@@ -10,38 +11,45 @@ class _StatVar:
 
 
 class OFileMeta:
+
+
     def __init__(self):
         """Define the variables for all posible attributes"""
         # basic file information
-        self.path = None
-        self.filename = None
+        self.file_path = None
+        self.file_name = None
         self.file_extension = None  # .ocd, .xmap, ...
-        self.file_group = None  # OCAD, Mapper, ...
-        self.file_type = None  # Map, CourseSetting, ...
+        self.file_size = None
+        self.file_date_last_modification = None
+        self.file_date_last_access = None
+        self.file_date_created = None
+
 
         # general file informations
-        self.note = None  # for example the OCAD-Map-note
-        self.version = None  # vor example by OCAD files OCAD12
+        self.meta_group = None  # OCAD, Mapper, ...
+        self.meta_type = None  # map, cs, ...
+        self.meta_note = None  # for example the OCAD-Map-note
+        self.meta_version = None  # vor example by OCAD files OCAD12
 
         # map's meta informations
-        self.scale = None
-        self.crs_code = None
-        self.crs_name = None
-        self.colors = []  # list of color-objects
-        self.backgroundmaps = []  # list of backgroundmap objects
-        self.symbols = []  # list of symbol objects
+        self.map_scale = None
+        self.map_crs_code = None
+        self.map_crs_name = None
+        self.map_colors = []  # list of color-objects
+        self.map_backgroundmaps = []  # list of backgroundmap objects
+        self.map_symbols = []  # list of symbol objects
 
         # course-setting informations
-        self.courses = []  # list of course-objects
+        self.cs_courses = []  # list of course-objects
 
         # raster file
-        self.pixelsize = None
-        self.coordinate_bottomleft = None
-        self.coordinate_topright = None
-        self.pixel_minvalue = None
-        self.pixel_maxvalue = None
-        self.pixel_pixelsize_in_x = None
-        self.pixel_pixelsize_in_y = None
+        self.raster_pixelsize = None
+        self.raster_coordinate_bottomleft = None
+        self.raster_coordinate_topright = None
+        self.raster_pixel_minvalue = None
+        self.raster_pixel_maxvalue = None
+        self.raster_pixel_pixelsize_in_x = None
+        self.raster_pixel_pixelsize_in_y = None
 
     def _add_color(self,
                    *,
@@ -52,7 +60,7 @@ class OFileMeta:
                    black=None,
                    magenta=None,
                    opacity=None):
-        self.colors.append(
+        self.map_colors.append(
             Color(
                 number=number,
                 name=name,
@@ -63,12 +71,12 @@ class OFileMeta:
                 opacity=opacity))
 
     def _add_symbol(self, *, number=None, name=None):
-        self.symbols.append(Symbol(number=number, name=name))
+        self.map_symbols.append(Symbol(number=number, name=name))
 
     def info(self):
         """Return alle ofiles_meta attributes nicely formated as string."""
         output = ""
-        output += "Filename: " + self.filename + "\n"
+        output += "Filename: " + self.file_name + "\n"
         output += "=" * 20 + "\n"
         for key in self.__dict__.keys():
             if type(self.__dict__[key]) == list:
@@ -131,6 +139,29 @@ class Symbol:
 class course:
     pass
 
+def analyze_file(ofile_meta):
+    """"add general file-information to a file-meta class
+
+    :argument
+    ofile_meta
+    :return
+    ofile_meta
+
+    """
+    if hasattr(ofile_meta, "file_path"):
+        path = ofile_meta.file_path
+    else:
+        path = ofile_meta
+    ofile_meta.file_name = os.path.basename(path)
+    ofile_meta.file_extension = os.path.splitext(ofile_meta.file_name)[1]
+    fileinfo = os.stat(path)
+    ofile_meta.file_size = fileinfo.st_size
+    ofile_meta.file_date_last_modification = datetime.datetime.fromtimestamp(fileinfo.st_mtime)
+    ofile_meta.file_date_last_access = datetime.datetime.fromtimestamp(fileinfo.st_atime)
+    ofile_meta.file_date_created = datetime.datetime.fromtimestamp(fileinfo.st_ctime)
+    return ofile_meta
+
+
 
 def get_meta(path):
     """Main function for getting all metadata of an file.
@@ -140,23 +171,23 @@ def get_meta(path):
     """
     ofilemeta = OFileMeta()
 
-    ofilemeta.path = path
-    ofilemeta.filename = os.path.basename(path)
-    ofilemeta.file_extension = os.path.splitext(ofilemeta.filename)[1]
+    ofilemeta.file_path = path
+
+    ofilemeta = analyze_file(ofilemeta)
 
     # Check to which file-group the file-type belongs to
     if ofilemeta.file_extension in _StatVar.file_type_from_ocad:
-        ofilemeta.file_group = "OCAD"
+        ofilemeta.meta_group = "OCAD"
 
         if ofilemeta.file_extension == ".ocd":
             ofilemeta = analyze_ocd(ofilemeta)
         elif ofilemeta.file_extension == ".ocdDem":
             ofilemeta = analyze_ocdDem(ofilemeta)
     elif ofilemeta.file_extension in _StatVar.file_type_from_mapper:
-        ofilemeta.file_group = "Mapper"
+        ofilemeta.meta_group = "Mapper"
         if ofilemeta.file_extension == ".xmap":
             ofilemeta = analyze_xmap(ofilemeta)
     else:
-        ofilemeta.file_group = "Not Supported"
+        ofilemeta.meta_group = "Not Supported"
 
     return (ofilemeta)
