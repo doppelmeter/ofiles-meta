@@ -2,7 +2,7 @@ import datetime
 import os
 
 from ofiles_meta.mapper import Xmap
-from ofiles_meta.ocad import ocddem, Ocd
+from ofiles_meta.ocad import OcdDem, Ocd
 
 
 class _StatVar:
@@ -51,15 +51,7 @@ class OFileMeta:
         self.raster_pixel_pixelsize_in_x = None
         self.raster_pixel_pixelsize_in_y = None
 
-    def _add_color(self,
-                   *,
-                   number=None,
-                   name=None,
-                   cyan=None,
-                   yellow=None,
-                   black=None,
-                   magenta=None,
-                   opacity=None):
+    def _add_color(self, *, number=None, name=None, cyan=None, yellow=None, black=None, magenta=None, opacity=None):
         self.map_colors.append(
             Color(
                 number=number,
@@ -182,7 +174,7 @@ def get_meta(path):
         if ofilemeta.file_extension == ".ocd":
             ofilemeta = Ocd.analyze(ofilemeta)
         elif ofilemeta.file_extension == ".ocdDem":
-            ofilemeta = ocddem.analyze(ofilemeta)
+            ofilemeta = OcdDem.analyze(ofilemeta)
     elif ofilemeta.file_extension in _StatVar.file_type_from_mapper:
         ofilemeta.meta_group = "Mapper"
         if ofilemeta.file_extension == ".xmap":

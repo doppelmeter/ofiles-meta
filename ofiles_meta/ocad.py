@@ -2,7 +2,7 @@ import struct
 from struct import unpack_from
 
 
-class ocddem:
+class OcdDem:
     def analyze(ofilemeta):
         file = open(ofilemeta.file_path, "rb")
         #
