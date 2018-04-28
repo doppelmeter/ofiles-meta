@@ -1,100 +1,121 @@
 import struct
+from struct import unpack_from
 
 
-def analyze(ofilemeta):
-    file = open(ofilemeta.file_path, "rb")
-
-    # header
-
-    class header:
-        pass
-
-    record_format = "<hbbhbbIIiiIIIIIIIII"
-    unpacked = struct.unpack_from(record_format, file.read(100))
-    header.ocad_mark = unpacked[0]
-    header.file_type = unpacked[1]
-    header.file_status = unpacked[2]
-    header.version = unpacked[3]
-    header.subversion = unpacked[4]
-    header.subsubversion = unpacked[5]
-    header.first_symbol_index_blk = unpacked[6]
-    header.object_index_block = unpacked[7]
-    header.offline_sync_serial = unpacked[8]
-    header.current_file_version = unpacked[9]
-    header.internal1 = unpacked[10]
-    header.internal2 = unpacked[11]
-    header.first_string_index_blk = unpacked[12]
-    header.file_name_pos = unpacked[13]
-    header.file_name_size = unpacked[14]
-    header.internal3 = unpacked[15]
-    header.res1 = unpacked[16]
-    header.res2 = unpacked[17]
-    header.mr_start_block_position = unpacked[18]
-
-    # header to ofiles-meta
-    type_dict = {0: "map", 1: "cs", 2: "map", 3: "cs", 7: "map", 8: "server"}
-    ofilemeta.meta_type = type_dict[header.file_type]
-
-    ofilemeta.meta_version = str(header.version)
-
-    if int(header.version) <= 9:
-        version_long = str(header.version) + "." + str(header.subversion)
-    else:
-        version_long = str(header.version) + "." + str(header.subversion) + "." + str(header.subsubversion)
-    # ofilemeta.meta_verion_long = version_long
-
-    # strings
-    string_index_block_list = []
-    next_index_block = header.first_string_index_blk  # this is actually the first
-    while next_index_block > 0:
-        string_index_block_list.append(next_index_block)
-        file.seek(next_index_block)
-        next_index_block = _int_rhex(file.read(4))
-
-    for index_block in string_index_block_list:
-        for i in range(0, 256):
-            file.seek(index_block + 4 + i * 16)
-            pos = _int_rhex(file.read(4))
-            length = _int_rhex(file.read(4))
-            rectype = _int_rhex(file.read(4))
-            objindex = _int_rhex(file.read(4))
-            if rectype != 0:
-                file.seek(pos)
-                string = file.read(length).decode("utf-8", errors='ignore')
-                string = string.strip("\x00")
-                split_string = string.split("\t")
-                i = 0
-                string_dict = {}
-                for codevalue in split_string:
-                    if i == 0:
-                        code = "First"
-                        value = codevalue
-                    else:
-                        code = codevalue[0:1]
-                        value = codevalue[1:]
-                    string_dict[code] = value
-                    i += 1
-                if rectype == 1061:
-                    ofilemeta.meta_note = string_dict["First"]
-                elif rectype == 1039:
-                    ofilemeta.map_crs_code = ocad_grid_id_2_epsg[int(string_dict["i"])]["epsg"]
-                    ofilemeta.map_crs_name = ocad_grid_id_2_epsg[int(string_dict["i"])]["name"]
-                    ofilemeta.map_scale = string_dict["m"]
-                elif rectype == 9:
-                    ofilemeta._add_color(
-                        number=int(string_dict["n"]),
-                        name=string_dict["First"],
-                        cyan=int(string_dict["c"]),
-                        magenta=int(string_dict["m"]),
-                        yellow=int(string_dict["y"]),
-                        black=int(string_dict["k"]),
-                        # overprint = string_dict["o"]
-                        opacity=int(string_dict["t"]))
+class ocddem:
+    def analyze(ofilemeta):
+        file = open(ofilemeta.file_path, "rb")
+        #
+        header = file.read(65)
+        file.close()
+        #
+        struc_string = "<b8shx10i"
+        unpacked = unpack_from(struc_string, header)
+        #
+        ofilemeta.meta_version = unpacked[2]
+        ofilemeta.raster_pixelsize = str(unpacked[3]) + "x" + str(unpacked[4])
+        ofilemeta.raster_coordinate_bottomleft = str(unpacked[5]) + ", " + str(unpacked[7])
+        ofilemeta.raster_coordinate_topright = str(unpacked[6]) + ", " + str(unpacked[8])
+        ofilemeta.raster_pixel_minvalue = unpacked[9]
+        ofilemeta.raster_pixel_maxvalue = unpacked[10]
+        ofilemeta.raster_pixel_pixelsize_in_x = unpacked[11]
+        ofilemeta.raster_pixel_pixelsize_in_y = unpacked[12]
+        #
+        return (ofilemeta)
 
 
+class Ocd:
+    def analyze(ofilemeta):
+        file = open(ofilemeta.file_path, "rb")
 
-    return (ofilemeta)
+        # header
 
+        class header:
+            pass
+
+        record_format = "<hbbhbbIIiiIIIIIIIII"
+        unpacked = struct.unpack_from(record_format, file.read(100))
+        header.ocad_mark = unpacked[0]
+        header.file_type = unpacked[1]
+        header.file_status = unpacked[2]
+        header.version = unpacked[3]
+        header.subversion = unpacked[4]
+        header.subsubversion = unpacked[5]
+        header.first_symbol_index_blk = unpacked[6]
+        header.object_index_block = unpacked[7]
+        header.offline_sync_serial = unpacked[8]
+        header.current_file_version = unpacked[9]
+        header.internal1 = unpacked[10]
+        header.internal2 = unpacked[11]
+        header.first_string_index_blk = unpacked[12]
+        header.file_name_pos = unpacked[13]
+        header.file_name_size = unpacked[14]
+        header.internal3 = unpacked[15]
+        header.res1 = unpacked[16]
+        header.res2 = unpacked[17]
+        header.mr_start_block_position = unpacked[18]
+
+        # header to ofiles-meta
+        type_dict = {0: "map", 1: "cs", 2: "map", 3: "cs", 7: "map", 8: "server"}
+        ofilemeta.meta_type = type_dict[header.file_type]
+
+        ofilemeta.meta_version = str(header.version)
+
+        if int(header.version) <= 9:
+            version_long = str(header.version) + "." + str(header.subversion)
+        else:
+            version_long = str(header.version) + "." + str(header.subversion) + "." + str(header.subsubversion)
+        # ofilemeta.meta_verion_long = version_long
+
+        # strings
+        string_index_block_list = []
+        next_index_block = header.first_string_index_blk  # this is actually the first
+        while next_index_block > 0:
+            string_index_block_list.append(next_index_block)
+            file.seek(next_index_block)
+            next_index_block = _int_rhex(file.read(4))
+
+        for index_block in string_index_block_list:
+            for i in range(0, 256):
+                file.seek(index_block + 4 + i * 16)
+                pos = _int_rhex(file.read(4))
+                length = _int_rhex(file.read(4))
+                rectype = _int_rhex(file.read(4))
+                objindex = _int_rhex(file.read(4))
+                if rectype != 0:
+                    file.seek(pos)
+                    string = file.read(length).decode("utf-8", errors='ignore')
+                    string = string.strip("\x00")
+                    split_string = string.split("\t")
+                    i = 0
+                    string_dict = {}
+                    for codevalue in split_string:
+                        if i == 0:
+                            code = "First"
+                            value = codevalue
+                        else:
+                            code = codevalue[0:1]
+                            value = codevalue[1:]
+                        string_dict[code] = value
+                        i += 1
+                    if rectype == 1061:
+                        ofilemeta.meta_note = string_dict["First"]
+                    elif rectype == 1039:
+                        ofilemeta.map_crs_code = ocad_grid_id_2_epsg[int(string_dict["i"])]["epsg"]
+                        ofilemeta.map_crs_name = ocad_grid_id_2_epsg[int(string_dict["i"])]["name"]
+                        ofilemeta.map_scale = string_dict["m"]
+                    elif rectype == 9:
+                        ofilemeta._add_color(
+                            number=int(string_dict["n"]),
+                            name=string_dict["First"],
+                            cyan=int(string_dict["c"]),
+                            magenta=int(string_dict["m"]),
+                            yellow=int(string_dict["y"]),
+                            black=int(string_dict["k"]),
+                            # overprint = string_dict["o"]
+                            opacity=int(string_dict["t"]))
+
+        return (ofilemeta)
 
 
 def _rhex(byte):
@@ -133,13 +154,6 @@ def _boolean(string_int):
         return (True)
     else:
         raise ValueError("Only 0 or 1 allowed")
-
-
-
-
-
-
-
 
 
 ocad_grid_id_2_epsg = {

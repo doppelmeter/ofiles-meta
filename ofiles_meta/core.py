@@ -1,8 +1,8 @@
-import os
 import datetime
-from ofiles_meta.ocad.ocd import analyze as analyze_ocd
-from ofiles_meta.ocad.ocdDem import analyze as analyze_ocdDem
-from ofiles_meta.mapper.xmap import analyze as analyze_xmap
+import os
+
+from ofiles_meta.mapper import Xmap
+from ofiles_meta.ocad import ocddem, Ocd
 
 
 class _StatVar:
@@ -180,13 +180,13 @@ def get_meta(path):
         ofilemeta.meta_group = "OCAD"
 
         if ofilemeta.file_extension == ".ocd":
-            ofilemeta = analyze_ocd(ofilemeta)
+            ofilemeta = Ocd.analyze(ofilemeta)
         elif ofilemeta.file_extension == ".ocdDem":
-            ofilemeta = analyze_ocdDem(ofilemeta)
+            ofilemeta = ocddem.analyze(ofilemeta)
     elif ofilemeta.file_extension in _StatVar.file_type_from_mapper:
         ofilemeta.meta_group = "Mapper"
         if ofilemeta.file_extension == ".xmap":
-            ofilemeta = analyze_xmap(ofilemeta)
+            ofilemeta = Xmap.analyze(ofilemeta)
     else:
         ofilemeta.meta_group = "Not Supported"
 
